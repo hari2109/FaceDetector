@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Billion Hearts</string>
+    <string name="provide_permission_text">Please provide permission to access your gallery to proceed further</string>
+    <string name="proceed">Proceed</string>
+    <string name="please_wait">Please wait…</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+
+    <!--Permissions -->
+
+    <string name="permission_contextual_dialog_title">Permission Required</string>
+    <string name="storage_permission_contextual_dialog_settings">For this feature to work, we need this permission, Please go to settings and provide the Storage Permission</string>
+</resources>
