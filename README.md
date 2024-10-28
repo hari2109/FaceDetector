@@ -2,10 +2,13 @@ Billion Hearts - Face Detector
 ==============================
 
 ## Summary
-This is an application that browses through the Android device gallery (DCIM folder) and detects faces of people in them
-The face detection is done with MediaPipe SDK, and uses the BlazeFace (short-range) model
-The detected images are displayed in a horizontally swipeable gallery and faces are highlighted with bounding boxes
-Users can optionally add names of the people as tags by tapping on the bounding box, names will be displayed below the boxes after saving
+This is an application that browses through the Android device gallery (DCIM folder) and detects faces of people in them.
+
+The face detection is done with MediaPipe SDK, and uses the BlazeFace (short-range) model.
+
+The detected images are displayed in a horizontally swipeable gallery and faces are highlighted with bounding boxes.
+
+Users can optionally add names of the people as tags by tapping on the bounding box, names will be displayed below the boxes after saving.
 
 ## Architecture
 The app follows a simple architecture with classes separated into UI, Domain and Data packages
