@@ -1,7 +1,6 @@
 package com.billionhearts.facedetector.domain
 
 import android.Manifest
-import android.Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -17,13 +16,13 @@ val GALLERY_PERMISSION =
         Manifest.permission.READ_EXTERNAL_STORAGE
     } else Manifest.permission.READ_MEDIA_IMAGES
 
-val Context.isMediaVisualUserSelected: Boolean
-    get() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-        ContextCompat.checkSelfPermission(this, READ_MEDIA_VISUAL_USER_SELECTED) ==
-                PackageManager.PERMISSION_GRANTED
-    } else {
-        false
-    }
+val Context.isGalleryPermissionGranted: Boolean
+    get() =
+        ContextCompat.checkSelfPermission(
+            this,
+            GALLERY_PERMISSION,
+        ) == PackageManager.PERMISSION_GRANTED
+
 
 val Activity.galleryShowRequestPermissionRationale: Boolean
     get() = ActivityCompat.shouldShowRequestPermissionRationale(this, GALLERY_PERMISSION)

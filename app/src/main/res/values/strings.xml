@@ -10,4 +10,9 @@
 
     <string name="permission_contextual_dialog_title">Permission Required</string>
     <string name="storage_permission_contextual_dialog_settings">For this feature to work, we need this permission, Please go to settings and provide the Storage Permission</string>
+    <string name="add_name">Add Name</string>
+    <string name="save">Save</string>
+    <string name="name_sample">John Smith</string>
+    <string name="galleryimage">GalleryImage</string>
+    <string name="empty_message">Sorry, we couldn\'t find any images with faces</string>
 </resources>
