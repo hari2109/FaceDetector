@@ -31,14 +31,12 @@ class FaceDetectorViewModel(application: Application) : AndroidViewModel(applica
         return getApplication() as Application
     }
 
-    private lateinit var faceDetectorHelper: FaceDetectorHelper
+    private val faceDetectorHelper: FaceDetectorHelper by lazy {
+        FaceDetectorHelper(context = getContext())
+    }
 
     val faceDetectorState: LiveData<DetectorState>
         get() = mutableStateFlow.asLiveData()
-
-    fun onCreate() {
-        faceDetectorHelper = FaceDetectorHelper(context = getContext())
-    }
 
     fun refreshState(hasStoragePermission: Boolean) {
         if (!hasStoragePermission) {

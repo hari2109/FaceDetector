@@ -48,7 +48,6 @@ class MainActivity : AppCompatActivity(), DetectedImageFragment.ShowNamePopUpLis
         enableEdgeToEdge()
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        viewModel.onCreate()
         initViews()
         initObservers()
     }
