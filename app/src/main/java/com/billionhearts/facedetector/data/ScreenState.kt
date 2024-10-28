@@ -7,7 +7,9 @@ sealed interface DetectorState {
     data object RequestPermission : DetectorState
     data object Loading : DetectorState
     data object Empty : DetectorState
-    data class Success(val list: List<DetectedImage>) : DetectorState
+    data class Success(
+        val list: List<DetectedImage>,
+        val refreshIndex: Int) : DetectorState
     data class Error(val errorMessage: String? = null) : DetectorState
 }
 
@@ -16,8 +18,7 @@ data class DetectedImage(
     val bitMap: Bitmap,
     val detectionItems: MutableList<DetectionItem>,
     val imageHeight: Int,
-    val imageWidth: Int,
-    val personName: String? = null
+    val imageWidth: Int
 )
 
 data class DetectionItem(

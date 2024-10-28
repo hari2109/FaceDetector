@@ -52,6 +52,12 @@ dependencies {
     implementation(libs.tasks.vision)
 
     testImplementation(libs.junit)
+    testImplementation(libs.robolectric)
+    testImplementation(libs.androidx.core.testing)
+    testImplementation(libs.mockito)
+    testImplementation(libs.mockito.android)
+    testImplementation(libs.mockk)
+
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 }

@@ -5,6 +5,7 @@ import android.content.ContentUris
 import android.net.Uri
 import android.provider.MediaStore
 import android.util.Log
+import androidx.annotation.VisibleForTesting
 import com.billionhearts.facedetector.isCursorUsable
 
 const val TAG = "FaceDetector"
@@ -14,61 +15,65 @@ data class ImageFileData(
     val fileName: String,
 )
 
-internal suspend fun getLatestImages(
-    contentResolver: ContentResolver,
-    startTimeStampInSeconds: Long,
-): List<ImageFileData> {
-    return getNewImagesForDetector(
-        contentResolver = contentResolver,
-        queryStartTimeStampInSeconds = startTimeStampInSeconds,
-    )
-}
+object FileDataHelper {
 
-private fun getNewImagesForDetector(
-    contentResolver: ContentResolver,
-    queryStartTimeStampInSeconds: Long,
-): List<ImageFileData> {
+    suspend fun getLatestImages(
+        contentResolver: ContentResolver,
+        startTimeStampInSeconds: Long,
+    ): List<ImageFileData> {
+        return getNewImagesForDetector(
+            contentResolver = contentResolver,
+            queryStartTimeStampInSeconds = startTimeStampInSeconds,
+        )
+    }
 
-    val projection = arrayOf(
-        MediaStore.Images.Media._ID,
-        MediaStore.Images.Media.DATA,
-        MediaStore.Images.Media.DISPLAY_NAME,
-        MediaStore.Images.Media.DATE_ADDED,
-    )
+    @VisibleForTesting
+    fun getNewImagesForDetector(
+        contentResolver: ContentResolver,
+        queryStartTimeStampInSeconds: Long,
+    ): List<ImageFileData> {
 
-    val sortOrder = "${MediaStore.Images.Media.DATE_ADDED} DESC"
-    val selection =
-        "${MediaStore.Images.Media.DATA} like ? and ${MediaStore.Images.Media.DATE_ADDED} > ?"
-    val selectionArgs = arrayOf("%DCIM%", queryStartTimeStampInSeconds.toString())
+        val projection = arrayOf(
+            MediaStore.Images.Media._ID,
+            MediaStore.Images.Media.DATA,
+            MediaStore.Images.Media.DISPLAY_NAME,
+            MediaStore.Images.Media.DATE_ADDED,
+        )
 
-    Log.d(TAG, "lastQueriedTimeStamp $queryStartTimeStampInSeconds")
+        val sortOrder = "${MediaStore.Images.Media.DATE_ADDED} DESC"
+        val selection =
+            "${MediaStore.Images.Media.DATA} like ? and ${MediaStore.Images.Media.DATE_ADDED} > ?"
+        val selectionArgs = arrayOf("%DCIM%", queryStartTimeStampInSeconds.toString())
 
-    return contentResolver.query(
-        MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-        projection,
-        selection,
-        selectionArgs,
-        sortOrder,
-    )?.use { cursor ->
-        if (cursor.isCursorUsable(cursor).not() || cursor.moveToFirst().not()) {
-            return emptyList()
-        }
-        return buildList {
-            cursor.moveToFirst()
-            do {
-                val uri = ContentUris.withAppendedId(
-                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                    cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)),
-                )
-                val fileName =
-                    cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME))
+        Log.d(TAG, "lastQueriedTimeStamp $queryStartTimeStampInSeconds")
 
-                val data = ImageFileData(
-                    uri = uri,
-                    fileName = fileName,
-                )
-                add(data)
-            } while (cursor.moveToNext())
-        }
-    } ?: emptyList()
+        return contentResolver.query(
+            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+            projection,
+            selection,
+            selectionArgs,
+            sortOrder,
+        )?.use { cursor ->
+            if (cursor.isCursorUsable(cursor).not() || cursor.moveToFirst().not()) {
+                return emptyList()
+            }
+            return buildList {
+                cursor.moveToFirst()
+                do {
+                    val uri = ContentUris.withAppendedId(
+                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                        cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)),
+                    )
+                    val fileName =
+                        cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME))
+
+                    val data = ImageFileData(
+                        uri = uri,
+                        fileName = fileName,
+                    )
+                    add(data)
+                } while (cursor.moveToNext())
+            }
+        } ?: emptyList()
+    }
 }

@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.billionhearts.facedetector.data.DetectedImage
 import com.billionhearts.facedetector.data.DetectionItem
 import com.billionhearts.facedetector.data.DetectorState
 import com.billionhearts.facedetector.databinding.LayoutDetectedImageBinding
@@ -48,26 +49,34 @@ class DetectedImageFragment: Fragment() {
             val state = viewModel.faceDetectorState.value
             if (state !is DetectorState.Success) return
             val result = state.list[imageIndex]
-            ivResult.setImageBitmap(result.bitMap)
-            tvFilename.text = result.fileName
+            setResult(result)
+        }
+    }
 
-            ivResult.post {
-                overlay.setResults(
-                    detectionItems = result.detectionItems,
-                    imageHeight = result.imageHeight,
-                    imageWidth = result.imageWidth
-                )
-                overlay.setBoxClickListener(object : OverlayView.BoxClickedListener {
-                    override fun onBoxClicked(boxIndex: Int) {
-                        val detectionItem = result.detectionItems.getOrNull(boxIndex) ?: return
-                        showNamePopupCallback?.showNameBottomSheet(
-                            detectionItem = detectionItem,
-                            boxIndex = boxIndex,
-                            imageIndex = imageIndex
-                        )
-                    }
-                })
-            }
+    fun setResult(value: DetectedImage) {
+        binding.setResult(value)
+    }
+
+    private fun LayoutDetectedImageBinding.setResult(result: DetectedImage) {
+        ivResult.setImageBitmap(result.bitMap)
+        tvFilename.text = result.fileName
+
+        ivResult.post {
+            overlay.setResults(
+                detectionItems = result.detectionItems,
+                imageHeight = result.imageHeight,
+                imageWidth = result.imageWidth
+            )
+            overlay.setBoxClickListener(object : OverlayView.BoxClickedListener {
+                override fun onBoxClicked(boxIndex: Int) {
+                    val detectionItem = result.detectionItems.getOrNull(boxIndex) ?: return
+                    showNamePopupCallback?.showNameBottomSheet(
+                        detectionItem = detectionItem,
+                        boxIndex = boxIndex,
+                        imageIndex = imageIndex
+                    )
+                }
+            })
         }
     }
 

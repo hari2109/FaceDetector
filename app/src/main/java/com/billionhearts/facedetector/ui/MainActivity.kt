@@ -11,6 +11,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.recyclerview.widget.DiffUtil
 import com.billionhearts.facedetector.R
 import com.billionhearts.facedetector.data.DetectionItem
 import com.billionhearts.facedetector.data.DetectorState
@@ -131,8 +132,20 @@ class MainActivity : AppCompatActivity(), DetectedImageFragment.ShowNamePopUpLis
             if (imagesListAdapter == null) {
                 imagesListAdapter = ImageListAdapter(this@MainActivity, state.list)
                 viewpager.adapter = imagesListAdapter
+            } else {
+                imagesListAdapter?.let { adapter ->
+                    val diffResult = DiffUtil.calculateDiff(
+                        PagerDiffUtil(
+                            oldItems = adapter.results,
+                            newItems = state.list,
+                        ),
+                    )
+                    diffResult.dispatchUpdatesTo(adapter)
+                    viewpager.post {
+                        viewpager.setCurrentItem(state.refreshIndex, false)
+                    }
+                }
             }
-
         }
     }
 

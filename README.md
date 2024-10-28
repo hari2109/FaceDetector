@@ -6,7 +6,7 @@ This is an application that browses through the Android device gallery (DCIM fol
 
 The face detection is done with MediaPipe SDK, and uses the BlazeFace (short-range) model.
 
-The detected images are displayed in a horizontally swipeable gallery and faces are highlighted with bounding boxes.
+The detected images are displayed in a horizontally swipeable gallery and faces are highlighted with bounding boxes. The confidence level of the detection is displayed below the box.
 
 Users can optionally add names of the people as tags by tapping on the bounding box, names will be displayed below the boxes after saving.
 

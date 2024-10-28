@@ -6,6 +6,7 @@ import android.graphics.ImageDecoder
 import android.os.Build
 import android.provider.MediaStore
 import android.util.Log
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.asLiveData
@@ -14,9 +15,9 @@ import com.billionhearts.facedetector.data.DetectedImage
 import com.billionhearts.facedetector.data.DetectionItem
 import com.billionhearts.facedetector.data.DetectorState
 import com.billionhearts.facedetector.domain.FaceDetectorHelper
+import com.billionhearts.facedetector.domain.FileDataHelper
 import com.billionhearts.facedetector.domain.ImageFileData
 import com.billionhearts.facedetector.domain.TAG
-import com.billionhearts.facedetector.domain.getLatestImages
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -44,17 +45,20 @@ class FaceDetectorViewModel(application: Application) : AndroidViewModel(applica
             mutableStateFlow.value = DetectorState.RequestPermission
             return
         }
+        if (mutableStateFlow.value is DetectorState.Success) {
+            return
+        }
         mutableStateFlow.value = DetectorState.Loading
         viewModelScope.launch(Dispatchers.IO) {
-            val imagesList = getLatestImages(
-                contentResolver = getContext().contentResolver,
-                startTimeStampInSeconds = getTimeStampStartInSeconds(),
-            )
-            if (imagesList.isEmpty()) {
-                mutableStateFlow.value = DetectorState.Empty
-                return@launch
-            }
             try {
+                val imagesList = FileDataHelper.getLatestImages(
+                    contentResolver = getContext().contentResolver,
+                    startTimeStampInSeconds = getTimeStampStartInSeconds(),
+                )
+                if (imagesList.isEmpty()) {
+                    mutableStateFlow.value = DetectorState.Empty
+                    return@launch
+                }
                 processImages(imagesList)
             } catch (e: Exception) {
                 setError(e.message)
@@ -62,7 +66,8 @@ class FaceDetectorViewModel(application: Application) : AndroidViewModel(applica
         }
     }
 
-    private fun processImages(imagesList: List<ImageFileData>) {
+    @VisibleForTesting
+    fun processImages(imagesList: List<ImageFileData>) {
         val detectedImages = mutableListOf<DetectedImage>()
         imagesList.forEach { imageItem ->
             getSourceFromImage(imageItem)
@@ -95,7 +100,7 @@ class FaceDetectorViewModel(application: Application) : AndroidViewModel(applica
             setError("Bitmap detection failed")
             return
         }
-        mutableStateFlow.value = DetectorState.Success(detectedImages)
+        mutableStateFlow.value = DetectorState.Success(list = detectedImages, refreshIndex = 0)
     }
 
     private fun getSourceFromImage(sample: ImageFileData): Bitmap? =
@@ -131,7 +136,7 @@ class FaceDetectorViewModel(application: Application) : AndroidViewModel(applica
         }
         val detectedImageCopy = result.copy(detectionItems = newDetectionItems)
         state[imageIndex] = detectedImageCopy
-        mutableStateFlow.value = DetectorState.Success(state)
+        mutableStateFlow.value = DetectorState.Success(list = state, refreshIndex = imageIndex)
     }
 
     private fun setError(errorMessage: String? = null) {
